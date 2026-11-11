@@ -1,0 +1,43 @@
+# Campo Visual
+
+Jogo de saúde visual: mapa lúdico da área de visão periférica.
+
+## Como jogar
+Fixe o olhar no ponto vermelho. Toque na tela ou aperte espaço ao ver a bolinha amarela. Ao final, um mapa mostra em verde os pontos vistos e em vermelho os não vistos.
+
+## Tecnologias
+HTML + CSS + JavaScript puro, sem bibliotecas. Sons sintetizados com a Web Audio API (OscillatorNode), sem arquivos de áudio. Publicado com GitHub Pages (branch main, pasta raiz).
+
+## Aviso
+Jogo lúdico e educativo. Não é diagnóstico e não substitui avaliação de um profissional de saúde.
+
+## Prompt Log
+Ferramenta de IA usada: Claude. Edite a coluna "Refatoração manual" com o que você realmente alterou.
+
+| # | Prompt utilizado | Refatoração manual |
+|---|------------------|--------------------|
+| 1 | "Crie um jogo em um único index.html (HTML, CSS e JS puro) com canvas que mapeie o campo visual: 8 direções por 3 distâncias, estímulos aleatórios e mapa final de acertos." | ✍️ Preencha (ex.: renomeei variáveis, separei funções, ajustei a dificuldade) |
+| 2 | "Gere sons de acerto e erro com a Web Audio API (OscillatorNode + GainNode), sem arquivos de áudio." | ✍️ Preencha (ex.: ajustei volume e frequências, tratei o resume() do AudioContext) |
+| 3 | "Melhore a acessibilidade: contraste, foco visível no teclado, aria-label nos botões e layout mobile." | ✍️ Preencha (ex.: testei no celular, corrigi tamanhos de toque) |
+| 4 | "Adicione tela de resultado e um aviso de que o jogo não substitui avaliação profissional." | ✍️ Preencha (ex.: reescrevi os textos em linguagem simples) |
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Campo Visual · Games for Health</title>
+<style>:root{--bg:#f3f6f9;--fg:#0d1b2a;--ac:#c2410c}@media(prefers-color-scheme:dark){:root{--bg:#0d1b2a;--fg:#eef3f8;--ac:#ff9a62}}
+body{font:18px/1.45 system-ui,sans-serif;background:var(--bg);color:var(--fg);max-width:640px;margin:auto;padding:16px;text-align:center}
+button{font:inherit;padding:.6em 1.2em;border:0;background:var(--ac);color:var(--bg);border-radius:10px;cursor:pointer}button:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.n{font-size:.8em;opacity:.8}#hud{min-height:1.6em;font-weight:700}
+#cv{width:100%;max-width:520px;background:#1b1b1f;border-radius:12px;touch-action:manipulation}</style>
+<h1>🎯 Campo Visual</h1><p>Olhe sempre para o ponto vermelho, a cerca de 30 cm da tela. Quando enxergar uma bolinha amarela na lateral, toque na tela ou aperte espaço.</p>
+<div id=hud></div><canvas id=cv width=600 height=600></canvas><p id=msg></p><button id=b>Começar</button>
+<p class=n>Mapa lúdico da sua visão periférica. Não é diagnóstico nem substitui exame oftalmológico.</p>
+<script>
+const A=new(window.AudioContext||window.webkitAudioContext)();function beep(f,d=.12,t='sine'){A.resume();const o=A.createOscillator(),g=A.createGain();o.type=t;o.frequency.value=f;g.gain.value=.15;o.connect(g).connect(A.destination);o.start();o.stop(A.currentTime+d)}
+const x=cv.getContext('2d'),C=300;let pts,k,res,resp,seen;
+function base(){x.clearRect(0,0,600,600);x.strokeStyle='#888888';[90,180,270].forEach(r=>{x.beginPath();x.arc(C,C,r,0,7);x.stroke()});x.fillStyle='#ff3b30';x.beginPath();x.arc(C,C,7,0,7);x.fill()}
+function dot(p,col){const a=p.a*Math.PI/4;x.fillStyle=col;x.beginPath();x.arc(C+Math.cos(a)*p.r*90,C+Math.sin(a)*p.r*90,12,0,7);x.fill()}
+b.onclick=()=>{pts=[];for(let a=0;a<8;a++)for(let r=1;r<=3;r++)pts.push({a,r});pts.sort(()=>Math.random()-.5);k=0;res=[];msg.textContent='';b.hidden=true;go()};
+function go(){if(k>=pts.length)return fim();hud.textContent=`Ponto ${k+1} de ${pts.length}`;base();
+setTimeout(()=>{dot(pts[k],'#ffd60a');seen=false;resp=true;setTimeout(()=>{base();setTimeout(()=>{resp=false;res.push({...pts[k],s:seen});k++;go()},900)},300)},600+Math.random()*900)}
+function hit(){if(resp&&!seen){seen=true;beep(660,.06)}}
+cv.addEventListener('pointerdown',hit);addEventListener('keydown',e=>{if(e.code=='Space'){e.preventDefault();hit()}});
+function fim(){base();res.forEach(p=>dot(p,p.s?'#30d158':'#ff453a'));hud.textContent='';const n=res.filter(p=>p.s).length;msg.textContent=`Você percebeu ${n} de ${res.length} pontos. Verde: visto · Vermelho: não visto (pode ter sido distração; repita o teste).`;b.textContent='Jogar de novo';b.hidden=false}
+</script>

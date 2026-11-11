@@ -1,0 +1,41 @@
+# MoviPausa
+
+Jogo de saúde para mobilidade: rotina guiada de alongamento e mobilidade articular.
+
+## Como jogar
+Siga os 6 exercícios (20 s cada), no ritmo do círculo que cresce e diminui. Cada exercício concluído vale 10 pontos e há sequência diária.
+
+## Tecnologias
+HTML + CSS + JavaScript puro, sem bibliotecas. Sons sintetizados com a Web Audio API (OscillatorNode), sem arquivos de áudio. Publicado com GitHub Pages (branch main, pasta raiz).
+
+## Aviso
+Jogo lúdico e educativo. Não é diagnóstico e não substitui avaliação de um profissional de saúde.
+
+## Prompt Log
+Ferramenta de IA usada: Claude. Edite a coluna "Refatoração manual" com o que você realmente alterou.
+
+| # | Prompt utilizado | Refatoração manual |
+|---|------------------|--------------------|
+| 1 | "Crie um jogo em um único index.html (HTML, CSS e JS puro) de mobilidade: 6 exercícios guiados com cronômetro, círculo de respiração, pontos e sequência diária no localStorage." | ✍️ Preencha (ex.: renomeei variáveis, separei funções, ajustei a dificuldade) |
+| 2 | "Gere sons de acerto e erro com a Web Audio API (OscillatorNode + GainNode), sem arquivos de áudio." | ✍️ Preencha (ex.: ajustei volume e frequências, tratei o resume() do AudioContext) |
+| 3 | "Melhore a acessibilidade: contraste, foco visível no teclado, aria-label nos botões e layout mobile." | ✍️ Preencha (ex.: testei no celular, corrigi tamanhos de toque) |
+| 4 | "Adicione tela de resultado e um aviso de que o jogo não substitui avaliação profissional." | ✍️ Preencha (ex.: reescrevi os textos em linguagem simples) |
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MoviPausa · Games for Health</title>
+<style>:root{--bg:#f3f6f9;--fg:#0d1b2a;--ac:#0a8f6a}@media(prefers-color-scheme:dark){:root{--bg:#0d1b2a;--fg:#eef3f8;--ac:#4fd1a5}}
+body{font:18px/1.45 system-ui,sans-serif;background:var(--bg);color:var(--fg);max-width:640px;margin:auto;padding:16px;text-align:center}
+button{font:inherit;padding:.6em 1.2em;border:0;background:var(--ac);color:var(--bg);border-radius:10px;cursor:pointer}button:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.n{font-size:.8em;opacity:.8}#hud{min-height:1.6em;font-weight:700}
+#c{width:140px;height:140px;border-radius:50%;background:var(--ac);margin:20px auto;transform:scale(.6)}#c.on{animation:r 6s ease-in-out infinite}@keyframes r{50%{transform:scale(1)}}@media(prefers-reduced-motion:reduce){#c.on{animation:none;transform:scale(.8)}}</style>
+<h1>🧘 MoviPausa</h1><p>Rotina guiada de mobilidade (cerca de 2 min). Siga o ritmo do círculo: inspire ao crescer, expire ao diminuir.</p>
+<div id=c></div><h2 id=nm></h2><p id=ds></p><div id=hud></div><button id=b>Começar</button> <button id=sk hidden>Pular</button>
+<p class=n>Movimentos suaves, sem dor. Pare se sentir desconforto e, em caso de lesão, consulte um profissional.</p>
+<script>
+const A=new(window.AudioContext||window.webkitAudioContext)();function beep(f,d=.12,t='sine'){A.resume();const o=A.createOscillator(),g=A.createGain();o.type=t;o.frequency.value=f;g.gain.value=.15;o.connect(g).connect(A.destination);o.start();o.stop(A.currentTime+d)}
+const ex=[['Pescoço','🙆','Incline a cabeça devagar para um lado e para o outro.'],['Ombros','🤷','Faça círculos amplos com os ombros, para trás.'],['Punhos','🤲','Gire os punhos nos dois sentidos.'],['Coluna','🧘','Sentado, gire o tronco suavemente para cada lado.'],['Quadril','🚶','Em pé, faça círculos lentos com o quadril.'],['Tornozelos','🦶','Gire cada tornozelo, apoiando-se se precisar.']];
+let i,s,iv,pts,ph;
+b.onclick=()=>{i=0;pts=0;step()};sk.onclick=()=>{i++;step()};
+function step(){clearInterval(iv);if(i>=ex.length)return fim();const[n,e,d]=ex[i];nm.textContent=e+' '+n;ds.textContent=d;s=0;c.className='';void c.offsetWidth;c.className='on';b.hidden=true;sk.hidden=false;iv=setInterval(tick,1000);tick()}
+function tick(){if(s>=20){pts+=10;beep(880,.2);i++;return step()}if(s%6==0){ph='Inspire';beep(440)}if(s%6==3){ph='Expire';beep(330)}hud.textContent=`${ph} · ${20-s}s · ${pts} pts`;s++}
+function fim(){c.className='';sk.hidden=true;nm.textContent='🏅 Rotina concluída!';ds.textContent=`${pts} pontos · sequência: ${streak()} dia(s)`;hud.textContent='';b.textContent='Repetir';b.hidden=false}
+function streak(){try{const d=new Date().toDateString(),o=JSON.parse(localStorage.movi||'{}');if(o.d!=d){o.s=(o.d==new Date(Date.now()-864e5).toDateString()?o.s:0)+1;o.d=d;localStorage.movi=JSON.stringify(o)}return o.s}catch(e){return 1}}
+</script>

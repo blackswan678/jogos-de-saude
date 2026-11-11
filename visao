@@ -1,0 +1,45 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Optotipo E · Games for Health</title>
+<style>:root{--bg:#f3f6f9;--fg:#0d1b2a;--ac:#7a3cff}@media(prefers-color-scheme:dark){:root{--bg:#0d1b2a;--fg:#eef3f8;--ac:#b999ff}}
+body{font:18px/1.45 system-ui,sans-serif;background:var(--bg);color:var(--fg);max-width:640px;margin:auto;padding:16px;text-align:center}
+button{font:inherit;padding:.6em 1.2em;border:0;background:var(--ac);color:var(--bg);border-radius:10px;cursor:pointer}button:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.n{font-size:.8em;opacity:.8}#hud{min-height:1.6em;font-weight:700}
+#e{height:220px;display:flex;align-items:center;justify-content:center;font:900 100px/1 Arial,sans-serif}#e[hidden]{display:none}.p{display:grid;grid-template-columns:repeat(3,72px);gap:8px;justify-content:center}.p button{height:72px;font-size:1.6em;padding:0}</style>
+<h1>👁️ Optotipo E</h1><p>Para onde a abertura do “E” aponta? Fique a cerca de 1 m da tela e teste um olho de cada vez. Use os botões ou as setas do teclado.</p>
+<div id=hud></div><div id=e hidden>E</div>
+<div class=p><i></i><button data-k=3 aria-label=cima>⬆️</button><i></i><button data-k=2 aria-label=esquerda>⬅️</button><i></i><button data-k=0 aria-label=direita>➡️</button><i></i><button data-k=1 aria-label=baixo>⬇️</button><i></i></div>
+<p id=msg></p><button id=b>Começar</button>
+<p class=n>Resultado relativo ao seu monitor e distância. Não é diagnóstico nem substitui exame oftalmológico.</p>
+<script>
+const A=new(window.AudioContext||window.webkitAudioContext)();function beep(f,d=.12,t='sine'){A.resume();const o=A.createOscillator(),g=A.createGain();o.type=t;o.frequency.value=f;g.gain.value=.15;o.connect(g).connect(A.destination);o.start();o.stop(A.currentTime+d)}
+let sz,lives,hit,rot,on=false;
+b.onclick=()=>{sz=120;lives=3;hit=null;on=true;msg.textContent='';b.hidden=true;e.hidden=false;round()};
+function round(){rot=Math.floor(Math.random()*4);e.style.fontSize=sz+'px';e.style.transform=`rotate(${rot*90}deg)`;hud.textContent=`Tamanho ${Math.round(sz)} px · Vidas ${'❤️'.repeat(lives)}`}
+function ans(k){if(!on)return;if(k==rot){beep(660);hit=sz;sz*=.82}else{beep(180,.25,'sawtooth');lives--}if(lives<1)return fim();round()}
+function fim(){on=false;e.hidden=true;hud.textContent='';msg.textContent=`Fim! Menor tamanho identificado: ${hit?Math.round(hit)+' px':'—'}. Quanto menor, melhor.`;b.textContent='Jogar de novo';b.hidden=false}
+document.querySelectorAll('.p button').forEach(x=>x.onclick=()=>ans(+x.dataset.k));
+addEventListener('keydown',ev=>{const m={ArrowRight:0,ArrowDown:1,ArrowLeft:2,ArrowUp:3};if(ev.key in m){ev.preventDefault();ans(m[ev.key])}});
+</script>
+# Optotipo E
+
+Jogo de saúde visual: teste lúdico de acuidade com o E de Snellen.
+
+🔗 **Jogo online:** https://SEU-USUARIO.github.io/optotipo/
+
+## Como jogar
+Indique para onde a abertura do E aponta, com botões ou setas do teclado. A letra diminui a cada acerto. Você tem 3 vidas.
+
+## Tecnologias
+HTML + CSS + JavaScript puro, sem bibliotecas. Sons sintetizados com a Web Audio API (OscillatorNode), sem arquivos de áudio. Publicado com GitHub Pages (branch main, pasta raiz).
+
+## Aviso
+Jogo lúdico e educativo. Não é diagnóstico e não substitui avaliação de um profissional de saúde.
+
+## Prompt Log
+Ferramenta de IA usada: Claude. Edite a coluna "Refatoração manual" com o que você realmente alterou.
+
+| # | Prompt utilizado | Refatoração manual |
+|---|------------------|--------------------|
+| 1 | "Crie um jogo em um único index.html (HTML, CSS e JS puro) de acuidade visual com o optotipo E em 4 rotações, tamanho decrescente, 3 vidas e botões direcionais." | ✍️ Preencha (ex.: renomeei variáveis, separei funções, ajustei a dificuldade) |
+| 2 | "Gere sons de acerto e erro com a Web Audio API (OscillatorNode + GainNode), sem arquivos de áudio." | ✍️ Preencha (ex.: ajustei volume e frequências, tratei o resume() do AudioContext) |
+| 3 | "Melhore a acessibilidade: contraste, foco visível no teclado, aria-label nos botões e layout mobile." | ✍️ Preencha (ex.: testei no celular, corrigi tamanhos de toque) |
+| 4 | "Adicione tela de resultado e um aviso de que o jogo não substitui avaliação profissional." | ✍️ Preencha (ex.: reescrevi os textos em linguagem simples) |

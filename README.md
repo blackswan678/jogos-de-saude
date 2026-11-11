@@ -1,2 +1,20 @@
-# jogos-de-sa-de
-4 jogos de saúde
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cromático · Games for Health</title>
+<style>:root{--bg:#f3f6f9;--fg:#0d1b2a;--ac:#0b5fff}@media(prefers-color-scheme:dark){:root{--bg:#0d1b2a;--fg:#eef3f8;--ac:#7fb0ff}}
+body{font:18px/1.45 system-ui,sans-serif;background:var(--bg);color:var(--fg);max-width:640px;margin:auto;padding:16px;text-align:center}
+button{font:inherit;padding:.6em 1.2em;border:0;background:var(--ac);color:var(--bg);border-radius:10px;cursor:pointer}button:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.n{font-size:.8em;opacity:.8}#hud{min-height:1.6em;font-weight:700}
+#g{display:grid;gap:6px;max-width:420px;margin:12px auto}.t{aspect-ratio:1;padding:0;border-radius:8px}</style>
+<h1>🎨 Cromático</h1><p>Toque no quadrado de cor diferente. A diferença diminui a cada nível.</p>
+<div id=hud></div><div id=g></div><p id=msg></p><button id=b>Começar</button>
+<p class=n>Jogo lúdico de percepção de cores. Não é diagnóstico nem substitui exame oftalmológico.</p>
+<script>
+const A=new(window.AudioContext||window.webkitAudioContext)();function beep(f,d=.12,t='sine'){A.resume();const o=A.createOscillator(),g=A.createGain();o.type=t;o.frequency.value=f;g.gain.value=.15;o.connect(g).connect(A.destination);o.start();o.stop(A.currentTime+d)}
+let lv,lives,best;
+b.onclick=()=>{lv=1;lives=3;best=null;msg.textContent='';b.hidden=true;next()};
+function next(){const n=Math.min(2+Math.ceil(lv/3),7),d=Math.max(2,28-lv*2),h=Math.random()*360,odd=Math.floor(Math.random()*n*n);
+g.style.gridTemplateColumns=`repeat(${n},1fr)`;g.innerHTML='';
+for(let i=0;i<n*n;i++){const t=document.createElement('button');t.className='t';t.setAttribute('aria-label','quadrado '+(i+1));t.style.background=`hsl(${i==odd?h+d:h} 65% 50%)`;t.onclick=()=>pick(i==odd,d);g.append(t)}
+hud.textContent=`Nível ${lv} · Vidas ${'❤️'.repeat(lives)} · Diferença ${d}°`}
+function pick(ok,d){if(ok){beep(660);lv++;best=d;next()}else{beep(180,.25,'sawtooth');if(--lives<1)return end();next()}}
+function end(){g.innerHTML='';hud.textContent='';msg.textContent=`Fim! Você chegou ao nível ${lv}. Menor diferença de matiz percebida: ${best??'—'}°.`;b.textContent='Jogar de novo';b.hidden=false}
+</script>
